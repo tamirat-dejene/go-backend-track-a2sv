@@ -63,18 +63,6 @@ var (
 var c, python, java bool
 var i, j, k int = 1, 2, 3
 
-
-func type_conversion() {
-	// gor requires explicit type conversion
-	i := 42
-	f := 3.142
-	g :=  0.867 + 0.5i
-
-
-	var k int
-	j := i
-
-}
 const PI = 3.1415
 
 const (
