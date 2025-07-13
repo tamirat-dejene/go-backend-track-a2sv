@@ -1,4 +1,4 @@
-package task1
+package main
 
 import (
 	"bufio"
@@ -39,7 +39,6 @@ func (s Student) String() string {
 	return sb.String()
 }
 
-
 func ReadStudent() (name string, cnum uint8, success bool) {
 	reader := bufio.NewReader(os.Stdin)
 	fmt.Print("Enter your name: ")
@@ -55,15 +54,17 @@ func ReadStudent() (name string, cnum uint8, success bool) {
 		fmt.Println("Invalid number of courses.")
 		return "", 0, false
 	}
+
 	cnum = uint8(numCoursesInt)
+	success = true
+
 	return
 }
 
 func ReadCourses(cnum uint8) map[Course]float32 {
 	var cg map[Course]float32
 
-
-	for i:= 1; i <= int(cnum); i++ {
+	for i := 1; i <= int(cnum); i++ {
 		reader := bufio.NewReader(os.Stdin)
 		fmt.Printf("Enter name for course #%d: ", i)
 		courseName, _ := reader.ReadString('\n')
@@ -101,7 +102,7 @@ func ReadCourses(cnum uint8) map[Course]float32 {
 		cg[course] = float32(grade)
 	}
 
-	return  cg
+	return cg
 }
 
 func CalculateGPA(courses map[Course]float32) float32 {
@@ -123,4 +124,20 @@ func CalculateGPA(courses map[Course]float32) float32 {
 func DisplayStudent(student *Student) {
 	fmt.Println(student)
 	fmt.Printf("GPA: %.2f\n", CalculateGPA(student.Grades))
+}
+
+func main() {
+	name, cnum, ok := ReadStudent()
+	if !ok {
+		return
+	}
+	courses := ReadCourses(cnum)
+
+
+	student := Student{
+		Name:   name,
+		Grades: courses,
+	}
+
+	DisplayStudent(&student)
 }

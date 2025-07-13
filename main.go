@@ -1,7 +1,6 @@
 package main
 
 /*
-
 	A Tour of Go: practice
 
 */
@@ -19,21 +18,23 @@ import (
 	"strings"
 	"time"
 )
+
 func WordCount(s string) (res map[string]int) {
 	splt := strings.Split(s, " ")
-	
+
 	for _, st := range splt {
 		v, ok := res[st]
-		
+
 		if ok {
 			res[st] = v + 1
 		} else {
 			res[st] = 1
 		}
 	}
-	
+
 	return
 }
+
 /*
 adds two numbers
 */
@@ -66,10 +67,9 @@ var i, j, k int = 1, 2, 3
 const PI = 3.1415
 
 const (
-	Big = 1 << 100
+	Big   = 1 << 100
 	Small = Big >> 99
 )
-
 
 func one() {
 	a := 5
@@ -175,7 +175,7 @@ func sqrt(x float64) string {
 		fmt.Println("Good afrernoon!")
 	default:
 		fmt.Println("Good evening!")
-		
+
 	}
 	return fmt.Sprint(math.Sqrt(x))
 }
@@ -280,7 +280,7 @@ func main() {
 	primes := [6]int{2, 3, 5, 7, 11, 13}
 	fmt.Println(primes)
 
-	str  := "Afhds sdfjbsndjf"
+	str := "Afhds sdfjbsndjf"
 	strings.Split(str, "")
 
 	fmt.Println(primes[1:3])
@@ -514,9 +514,8 @@ func main() {
 	r3 := rot13Reader{s3}
 	io.Copy(os.Stdout, &r3)
 
-
 	si := []int{1, 3, 5, 7}
-	ss2 := []string{"A", "B","C", "D"}
+	ss2 := []string{"A", "B", "C", "D"}
 
 	fmt.Println(Index(si, 3))
 	fmt.Println(Index(ss2, "B"))
@@ -524,16 +523,14 @@ func main() {
 
 type List[T any] struct {
 	Next *List[T]
-	Val T
+	Val  T
 }
 
 type LinkedList interface {
 	Add(val int) bool
 }
 
-
-
-func Index[T comparable](s []T,  x T) int {
+func Index[T comparable](s []T, x T) int {
 	for i, v := range s {
 		if v == x {
 			return i
@@ -542,10 +539,7 @@ func Index[T comparable](s []T,  x T) int {
 	return -1
 }
 
-
-
 type Rectangle struct {
-
 }
 type Image interface {
 	ColorModel() color.Model
