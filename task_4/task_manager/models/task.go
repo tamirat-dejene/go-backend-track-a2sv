@@ -2,8 +2,6 @@ package models
 
 import (
 	"time"
-
-	"github.com/google/uuid"
 )
 
 type TaskStatus string
@@ -14,7 +12,7 @@ const (
 )
 
 type Task struct {
-	ID          uuid.UUID  `json:"id"`
+	ID          string     `json:"id" binding:"uuid"`
 	Title       string     `json:"title" binding:"required"`
 	Description string     `json:"description" binding:"required"`
 	DueDate     time.Time  `json:"due_date" binding:"required"`

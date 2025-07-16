@@ -13,11 +13,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type message struct {
-	M string `json:"m"`
-}
-
-// Graceful shutdown of the server
+// close gracefully shuts down the HTTP server when an interrupt signal is received.
 func close(srv *http.Server) {
 	quit := make(chan os.Signal, 1)
 	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
