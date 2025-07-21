@@ -3,7 +3,6 @@ package data
 import (
 	"context"
 	"fmt"
-	"os"
 	"t4/taskmanager/constants"
 	"t4/taskmanager/models"
 	"time"
@@ -11,13 +10,6 @@ import (
 	"github.com/golang-jwt/jwt"
 	"go.mongodb.org/mongo-driver/bson"
 	"golang.org/x/crypto/bcrypt"
-)
-
-var (
-	ATS = os.Getenv("ACCESS_TOKEN_SECRET")
-	RTS = os.Getenv("REFRESH_TOKEN_SECRET")
-	ATE = os.Getenv("ACCESS_TOKEN_EXPIRY")
-	RTE = os.Getenv("REFRESH_TOKEN_EXPIRY")
 )
 
 type JWTPayload struct {

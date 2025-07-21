@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"net/http"
+	"os"
 	"t4/taskmanager/constants"
 	"t4/taskmanager/data"
 	"t4/taskmanager/models"
@@ -34,13 +35,13 @@ func LoginUser(ctx *gin.Context) {
 	// Sign user, with jwt
 	access_token, err1 := data.SignUser(&data.JWTPayload{
 		UserName: user.UserName,
-		Exp:      data.ATE,
-	}, data.ATS)
+		Exp:      os.Getenv("ATE"),
+	}, os.Getenv("ATS"))
 
 	refresh_token, err2 := data.SignUser(&data.JWTPayload{
 		UserName: user.UserName,
-		Exp:      data.RTE,
-	}, data.RTS)
+		Exp:      os.Getenv("RTE"),
+	}, os.Getenv("RTS"))
 
 	if err1 != nil || err2 != nil {
 		var tokenErr error

@@ -1,6 +1,8 @@
 package middlewares
 
 import (
+	"fmt"
+	"os"
 	"strings"
 	"t4/taskmanager/data"
 
@@ -22,25 +24,36 @@ func AuthMiddleWare() gin.HandlerFunc {
 		}
 
 		access_token := auth_header_parts[1]
-		refresh_token, err := ctx.Cookie("refresh_token")
-
-		if err != nil {
-			ctx.AbortWithStatusJSON(401, gin.H{"error": "Refresh token required"})
-			return
-		}
-
-		user_name, err := data.ValidateToken(access_token, []byte(data.ATS))
+		user_name, err := data.ValidateToken(access_token, []byte(os.Getenv("ATS")))
 		if err == nil {
 			ctx.Set("user_name", user_name)
 			ctx.Next()
 			return
 		}
 
-		user_name, err = data.ValidateToken(refresh_token, []byte(data.RTS))
+		refresh_token, err := ctx.Cookie("refresh_token")
+		if err != nil {
+			ctx.AbortWithStatusJSON(401, gin.H{"error": "Refresh token required"})
+			return
+		}
+
+		user_name, err = data.ValidateToken(refresh_token, []byte(os.Getenv("RTS")))
 		if err != nil {
 			ctx.AbortWithStatusJSON(401, gin.H{"error": "Invalid refresh token, please log in again"})
 			return
 		}
+
+		token, err := data.SignUser(&data.JWTPayload{
+			UserName: user_name,
+			Exp:      os.Getenv("ATE"),
+		}, os.Getenv("ATE"))
+
+		if err != nil {
+			ctx.AbortWithStatusJSON(500, gin.H{"error": "Failed to refresh access token"})
+			return
+		}
+
+		ctx.Header("Authorization", fmt.Sprintf("Bearer %s", token))
 		ctx.Set("user_name", user_name)
 		ctx.Next()
 	}
