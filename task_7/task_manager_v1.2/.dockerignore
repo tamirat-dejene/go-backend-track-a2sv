@@ -1,0 +1,9 @@
+# Binaries
+task_manager_v1
+*.exe
+*.out
+
+# Git & editor junk
+.git
+.vscode
+
