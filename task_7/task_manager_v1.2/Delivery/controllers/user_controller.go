@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"fmt"
 	"net/http"
 	"t7/taskmanager/Delivery/bootstrap"
 	domain "t7/taskmanager/Domain"
@@ -132,5 +133,40 @@ func (uc *UserController) Login(ctx *gin.Context) {
 		},
 		"access_token":  access_token,
 		"refresh_token": refresh_token,
+	})
+}
+
+func (uc *UserController) Refresh(ctx *gin.Context) {
+	refreshToken, err := ctx.Cookie("refresh_token")
+	fmt.Println(refreshToken)
+	if err != nil || refreshToken == "" {
+		ctx.JSON(http.StatusUnauthorized, gin.H{"message": "Refresh token missing or invalid. Try to re login"})
+		return
+	}
+
+	user_name, err := infrustructure.IsAuthorized(refreshToken, []byte(uc.Env.RefTS))
+	if err != nil {
+		ctx.JSON(http.StatusUnauthorized, gin.H{"message": "Invalid refresh token", "error": err.Error()})
+		return
+	}
+
+	accessToken, err := infrustructure.CreateToken(user_name, uc.Env.AccTE, uc.Env.AccTS)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"message": "Failed to generate access token", "error": err.Error()})
+		return
+	}
+
+	ctx.Header("Authorization", "Bearer "+accessToken)
+	ctx.JSON(http.StatusOK, gin.H{
+		"message":      "Access token refreshed successfully.",
+		"access_token": accessToken,
+	})
+}
+
+func (uc *UserController) Logout(ctx *gin.Context) {
+	ctx.SetCookie("refresh_token", "", -1, "/", "", false, true)
+	ctx.Header("Authorization", "")
+	ctx.JSON(http.StatusOK, gin.H{
+		"message": "Logout successful. Tokens have been cleared.",
 	})
 }

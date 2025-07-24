@@ -33,12 +33,11 @@ func Setup(env *bootstrap.Env, timeout time.Duration, db *mongo.Database, router
 	}
 
 	auth.POST("/login", uc.Login)
+	auth.GET("/logout", uc.Logout)
+	auth.GET("/refresh", uc.Refresh)
 	auth.POST("/register", uc.Register)
-	// auth.POST("/refresh", controllers.RefreshUserToken)
-	// auth.POST("/logout", controllers.LogoutUser)
 	auth.DELETE("/delete/:id", uc.Delete)
 	auth.GET("/users", uc.GetAll)
-
 	var api = router.Group("/api")
 	tr := repositories.NewTaskRepository(db, domain.TaskCollection)
 	tc := &controllers.TaskController{

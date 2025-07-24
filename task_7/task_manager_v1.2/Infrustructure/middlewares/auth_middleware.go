@@ -1,7 +1,6 @@
 package middlewares
 
 import (
-	"fmt"
 	"strings"
 	"t7/taskmanager/Delivery/bootstrap"
 	infrustructure "t7/taskmanager/Infrustructure"
@@ -31,27 +30,6 @@ func AuthMiddleWare(env *bootstrap.Env) gin.HandlerFunc {
 			return
 		}
 
-		refresh_token, err := ctx.Cookie("refresh_token")
-		if err != nil {
-			ctx.AbortWithStatusJSON(401, gin.H{"error": "Refresh token required"})
-			return
-		}
-
-		user_name, err = infrustructure.IsAuthorized(refresh_token, []byte(env.RefTS))
-		if err != nil {
-			ctx.AbortWithStatusJSON(401, gin.H{"error": "Invalid refresh token, please log in again"})
-			return
-		}
-
-		token, err := infrustructure.CreateToken(user_name, env.AccTE, env.AccTS)
-
-		if err != nil {
-			ctx.AbortWithStatusJSON(500, gin.H{"error": "Failed to refresh access token"})
-			return
-		}
-
-		ctx.Header("Authorization", fmt.Sprintf("Bearer %s", token))
-		ctx.Set("user_name", user_name)
-		ctx.Next()
+		ctx.AbortWithStatusJSON(401, gin.H{"error": "Invalid access token, please log in again"})
 	}
 }
