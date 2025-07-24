@@ -17,10 +17,13 @@ type JWTPayload struct {
 	Exp      string
 }
 
-func SignUser(payload *JWTPayload, secret string) (string, error) {
-	claims := jwt.MapClaims{
-		"user_name": payload.UserName,
-		"exp":       payload.Exp,
+func CreateToken(user_name string, expiry int, secret string) (string, error) {
+	exp := time.Now().Add(time.Hour * time.Duration(expiry)).Unix()
+	claims := models.JWTPayload{
+		UserName: user_name,
+		StandardClaims: jwt.StandardClaims{
+			ExpiresAt: exp,
+		},
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)

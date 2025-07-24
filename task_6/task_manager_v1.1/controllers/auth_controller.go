@@ -33,15 +33,8 @@ func LoginUser(ctx *gin.Context) {
 	}
 
 	// Sign user, with jwt
-	access_token, err1 := data.SignUser(&data.JWTPayload{
-		UserName: user.UserName,
-		Exp:      os.Getenv("ATE"),
-	}, os.Getenv("ATS"))
-
-	refresh_token, err2 := data.SignUser(&data.JWTPayload{
-		UserName: user.UserName,
-		Exp:      os.Getenv("RTE"),
-	}, os.Getenv("RTS"))
+	access_token, err1 := data.CreateToken(user.UserName, 2, os.Getenv("ATS"))
+	refresh_token, err2 := data.CreateToken(user.UserName, 168, os.Getenv("RTS"))
 
 	if err1 != nil || err2 != nil {
 		var tokenErr error
@@ -139,8 +132,35 @@ func GetUsers(ctx *gin.Context) {
 }
 
 func RefreshUserToken(ctx *gin.Context) {
+	refreshToken, err := ctx.Cookie("refresh_token")
+	if err != nil || refreshToken == "" {
+		ctx.JSON(http.StatusUnauthorized, gin.H{"message": "Refresh token missing or invalid. Try to re login"})
+		return
+	}
 
+	user_name, err := data.ValidateToken(refreshToken, []byte(os.Getenv("RTS")))
+	if err != nil {
+		ctx.JSON(http.StatusUnauthorized, gin.H{"message": "Invalid refresh token", "error": err.Error()})
+		return
+	}
+
+	accessToken, err := data.CreateToken(user_name, 2, os.Getenv("ATS"))
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"message": "Failed to generate access token", "error": err.Error()})
+		return
+	}
+
+	ctx.Header("Authorization", "Bearer "+accessToken)
+	ctx.JSON(http.StatusOK, gin.H{
+		"message":      "Access token refreshed successfully.",
+		"access_token": accessToken,
+	})
 }
 
 func LogoutUser(ctx *gin.Context) {
+	ctx.SetCookie("refresh_token", "", -1, "/", "", false, true)
+	ctx.Header("Authorization", "")
+	ctx.JSON(http.StatusOK, gin.H{
+		"message": "Logout successful. Tokens have been cleared.",
+	})
 }

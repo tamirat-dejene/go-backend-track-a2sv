@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"fmt"
 	"net/http"
 	"t7/taskmanager/Delivery/bootstrap"
 	domain "t7/taskmanager/Domain"
@@ -138,7 +137,6 @@ func (uc *UserController) Login(ctx *gin.Context) {
 
 func (uc *UserController) Refresh(ctx *gin.Context) {
 	refreshToken, err := ctx.Cookie("refresh_token")
-	fmt.Println(refreshToken)
 	if err != nil || refreshToken == "" {
 		ctx.JSON(http.StatusUnauthorized, gin.H{"message": "Refresh token missing or invalid. Try to re login"})
 		return
