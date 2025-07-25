@@ -4,8 +4,8 @@ import (
 	"context"
 	"fmt"
 	domain "t7/taskmanager/Domain"
-	infrustructure "t7/taskmanager/Infrustructure"
-	"t7/taskmanager/Infrustructure/constants"
+	infrastructure "t7/taskmanager/Infrastructure"
+	"t7/taskmanager/Infrastructure/constants"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -25,7 +25,7 @@ func (u *userRepository) Login(ctx context.Context, user *domain.User) (*domain.
 	}
 
 	// check
-	err = infrustructure.ValidatePassword(storedUser.Password, user.Password)
+	err = infrastructure.ValidatePassword(storedUser.Password, user.Password)
 	if err != nil {
 		return nil, fmt.Errorf("%s", constants.INVALID_CREDETNTIALS)
 	}
@@ -98,7 +98,7 @@ func (u *userRepository) Register(ctx context.Context, user *domain.User) (strin
 		return "", fmt.Errorf("%s", constants.DUPLICATE_USERNAME)
 	}
 
-	hashedPassword, err := infrustructure.GetHashedPassword(user.Password, bcrypt.DefaultCost)
+	hashedPassword, err := infrastructure.GetHashedPassword(user.Password, bcrypt.DefaultCost)
 	if err != nil {
 		return "", err
 	}

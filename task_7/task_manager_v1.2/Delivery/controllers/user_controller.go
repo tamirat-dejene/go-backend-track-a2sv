@@ -4,8 +4,8 @@ import (
 	"net/http"
 	"t7/taskmanager/Delivery/bootstrap"
 	domain "t7/taskmanager/Domain"
-	infrustructure "t7/taskmanager/Infrustructure"
-	"t7/taskmanager/Infrustructure/constants"
+	infrastructure "t7/taskmanager/Infrastructure"
+	"t7/taskmanager/Infrastructure/constants"
 
 	"github.com/gin-gonic/gin"
 )
@@ -104,8 +104,8 @@ func (uc *UserController) Login(ctx *gin.Context) {
 	}
 
 	// Sign user, with jwt
-	access_token, err1 := infrustructure.CreateToken(user.UserName, uc.Env.AccTE, uc.Env.AccTS)
-	refresh_token, err2 := infrustructure.CreateToken(user.UserName, uc.Env.RefTE, uc.Env.RefTS)
+	access_token, err1 := infrastructure.CreateToken(user.UserName, uc.Env.AccTE, uc.Env.AccTS)
+	refresh_token, err2 := infrastructure.CreateToken(user.UserName, uc.Env.RefTE, uc.Env.RefTS)
 
 	if err1 != nil || err2 != nil {
 		var tokenErr error
@@ -142,13 +142,13 @@ func (uc *UserController) Refresh(ctx *gin.Context) {
 		return
 	}
 
-	user_name, err := infrustructure.IsAuthorized(refreshToken, []byte(uc.Env.RefTS))
+	user_name, err := infrastructure.IsAuthorized(refreshToken, []byte(uc.Env.RefTS))
 	if err != nil {
 		ctx.JSON(http.StatusUnauthorized, gin.H{"message": "Invalid refresh token", "error": err.Error()})
 		return
 	}
 
-	accessToken, err := infrustructure.CreateToken(user_name, uc.Env.AccTE, uc.Env.AccTS)
+	accessToken, err := infrastructure.CreateToken(user_name, uc.Env.AccTE, uc.Env.AccTS)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"message": "Failed to generate access token", "error": err.Error()})
 		return

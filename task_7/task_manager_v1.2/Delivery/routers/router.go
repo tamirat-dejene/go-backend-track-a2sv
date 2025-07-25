@@ -5,7 +5,7 @@ import (
 	"t7/taskmanager/Delivery/bootstrap"
 	"t7/taskmanager/Delivery/controllers"
 	domain "t7/taskmanager/Domain"
-	"t7/taskmanager/Infrustructure/middlewares"
+	"t7/taskmanager/Infrastructure/middlewares"
 	repositories "t7/taskmanager/Repositories"
 	usecases "t7/taskmanager/Usecases"
 	"time"
