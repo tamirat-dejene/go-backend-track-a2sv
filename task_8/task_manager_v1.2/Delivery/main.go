@@ -53,3 +53,41 @@ func main() {
 
 	close(srv)
 }
+
+
+// package main
+
+// import (
+// 	"fmt"
+// )
+
+// func Calculate(x int) (result int) {
+// 	result = x + 2
+// 	return result
+// }
+
+// type MessageService interface {
+// 	SendChargeNotification(int) error
+// }
+// type SMSService struct{}
+// func (ss *SMSService) SendChargeNotification(int) error {
+// 	fmt.Println("Sending Production Charge Notification")
+// 	return nil
+// }
+
+// type MyService struct {
+// 	messageService MessageService
+// }
+// func (ms *MyService) ChargeCustomer(value int) error {
+// 	ms.messageService.SendChargeNotification(value)
+// 	fmt.Printf("Charging customer for the value of %d\n", value)
+// 	return  nil
+// }
+
+// func main() {
+// 	// fmt.Println("Hello World!")
+
+// 	smsService := SMSService{}
+// 	myService := MyService{messageService: &smsService}
+// 	myService.ChargeCustomer(100)
+// }

@@ -9,32 +9,55 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-func NewMongoDatabase(env *Env) *mongo.Client {
+// refactored the database connector to make it testable
+type MongoClientManager interface {
+	Connect(ctx context.Context, uri string) (*mongo.Client, error)
+	Ping(ctx context.Context, client *mongo.Client) error
+	Disconnect(client *mongo.Client) error
+}
+
+type DefaultMongoClientManager struct{}
+
+func (d *DefaultMongoClientManager) Connect(ctx context.Context, uri string) (*mongo.Client, error) {
+	return mongo.Connect(ctx, options.Client().ApplyURI(uri))
+}
+
+func (d *DefaultMongoClientManager) Ping(ctx context.Context, client *mongo.Client) error {
+	return client.Ping(ctx, nil)
+}
+
+func (d *DefaultMongoClientManager) Disconnect(client *mongo.Client) error {
+	return client.Disconnect(context.TODO())
+}
+
+func NewMongoDatabase(env *Env, mcm MongoClientManager) (*mongo.Client, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
-	client, err := mongo.Connect(ctx, options.Client().ApplyURI(env.MongoUri))
+	client, err := mcm.Connect(ctx, env.MongoUri)
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
 
-	if err := client.Ping(ctx, nil); err != nil {
-		log.Fatal(err)
+	if err := mcm.Ping(ctx, client); err != nil {
+		return nil, err
 	}
 
 	log.Println("Successfully connected to MongoDB.")
-	return client
+	return client, nil
 }
 
-func CloseMongoDBConnection(client *mongo.Client) {
+func CloseMongoDBConnection(client *mongo.Client, mcm MongoClientManager) error {
 	if client == nil {
-		return
+		return nil
 	}
 
-	err := client.Disconnect(context.TODO())
+	err := mcm.Disconnect(client)
+
 	if err != nil {
-		log.Fatal(err)
+		return  err
 	}
 
 	log.Println("Connection to MongoDB closed.")
+	return  nil
 }

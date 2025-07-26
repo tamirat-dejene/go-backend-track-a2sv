@@ -1,6 +1,10 @@
 package bootstrap
 
-import "go.mongodb.org/mongo-driver/mongo"
+import (
+	"log"
+
+	"go.mongodb.org/mongo-driver/mongo"
+)
 
 type Application struct {
 	Env   *Env
@@ -10,10 +14,18 @@ type Application struct {
 func App() Application {
 	app := &Application{}
 	app.Env = NewEnv()
-	app.Mongo = NewMongoDatabase(app.Env)
+	mongo_client, err := NewMongoDatabase(app.Env, &DefaultMongoClientManager{})
+	
+	if err != nil {
+		log.Fatal(err)
+	}
+	app.Mongo = mongo_client
 	return *app
 }
 
 func (app *Application) CloseDBConnection() {
-	CloseMongoDBConnection(app.Mongo)
+	err := CloseMongoDBConnection(app.Mongo, &DefaultMongoClientManager{})
+	if err != nil {
+		log.Println("Error closing MongoDB connection:", err)
+	}
 }
