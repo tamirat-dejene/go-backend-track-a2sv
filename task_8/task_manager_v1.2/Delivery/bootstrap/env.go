@@ -1,6 +1,7 @@
 package bootstrap
 
 import (
+	"fmt"
 	"log"
 
 	"github.com/spf13/viper"
@@ -17,24 +18,23 @@ type Env struct {
 	AccTE          int    `mapstructure:"ACCESS_TOKEN_EXPIRY_HOUR"`
 	ContextTimeout int    `mapstructure:"CTX_TIMEOUT"`
 }
+// Viper can be made injectable
+func NewEnv(fileName string) (*Env, error) {
+	v := viper.New()
+	v.SetConfigFile(fileName)
 
-func NewEnv() *Env {
-	env := Env{}
-	viper.SetConfigFile(".env")
-
-	err := viper.ReadInConfig()
-	if err != nil {
-		log.Fatal("Can't find the file .env : ", err)
+	if err := v.ReadInConfig(); err != nil {
+		return nil, fmt.Errorf("failed to read config file: %w", err)
 	}
 
-	err = viper.Unmarshal(&env)
-	if err != nil {
-		log.Fatal("Environment can't be loaded: ", err)
+	var env Env
+	if err := v.Unmarshal(&env); err != nil {
+		return nil, fmt.Errorf("failed to unmarshal env: %w", err)
 	}
 
 	if env.AppEnv == "development" {
 		log.Println("The App is running in development env")
 	}
 
-	return &env
+	return &env, nil
 }

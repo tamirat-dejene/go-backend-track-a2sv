@@ -10,6 +10,9 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 // Mock the actual database connector
+const (
+	ENV_FILE = "../../.env"
+)
 type MockMongoClientManager struct {
 	mock.Mock
 }
@@ -33,7 +36,7 @@ func (m *MockMongoClientManager) Disconnect(client *mongo.Client) error{
 func TestNewMongoDatabase_Success(t *testing.T) {
 	mmcm := new(MockMongoClientManager)
 	mock_client := &mongo.Client{}
-	mock_env := NewEnv()
+	mock_env, _ := NewEnv(ENV_FILE)
 	mock_env.MongoUri = "mongodb://mock-uri"
 
 	mmcm.On("Connect", mock.Anything, mock_env.MongoUri).Return(mock_client, nil)
@@ -49,7 +52,7 @@ func TestNewMongoDatabase_Success(t *testing.T) {
 // Connect fails due to bad uri
 func TestNewMongoDatabase_ConnectFails(t *testing.T) {
 	mmcm := new(MockMongoClientManager)
-	env := NewEnv()
+	env, _ := NewEnv(ENV_FILE)
 	env.MongoUri = "mongodb://bad-uri"
 
 	mmcm.On("Connect", mock.Anything, env.MongoUri).Return((*mongo.Client)(nil), errors.New("connection failed"))
@@ -65,7 +68,7 @@ func TestNewMongoDatabase_ConnectFails(t *testing.T) {
 // Pinging fails
 func TestNewMongoDatabase_PingFails(t *testing.T) {
 	mmcm := new(MockMongoClientManager)
-	env := NewEnv()
+	env, _ := NewEnv(ENV_FILE)
 	env.MongoUri = "mongodb://mock-uri"
 	mockClient := &mongo.Client{}
 

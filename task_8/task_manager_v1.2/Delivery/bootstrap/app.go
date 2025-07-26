@@ -13,13 +13,19 @@ type Application struct {
 
 func App() Application {
 	app := &Application{}
-	app.Env = NewEnv()
-	mongo_client, err := NewMongoDatabase(app.Env, &DefaultMongoClientManager{})
-	
+	env, err := NewEnv(".env")
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	mongo_client, err := NewMongoDatabase(app.Env, &DefaultMongoClientManager{})
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	app.Mongo = mongo_client
+	app.Env = env
+	
 	return *app
 }
 
