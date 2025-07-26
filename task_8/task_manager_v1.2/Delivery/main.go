@@ -30,7 +30,7 @@ func close(srv *http.Server) {
 }
 
 func main() {
-	app := bootstrap.App()
+	app := bootstrap.App(".env")
 	env := app.Env
 	db := app.Mongo.Database(env.DBName)
 	defer app.CloseDBConnection()

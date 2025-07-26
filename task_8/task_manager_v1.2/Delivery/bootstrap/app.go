@@ -11,26 +11,26 @@ type Application struct {
 	Mongo *mongo.Client
 }
 
-func App() Application {
+func App(envPath string) Application {
 	app := &Application{}
-	env, err := NewEnv(".env")
+	env, err := NewEnv(envPath)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	mongo_client, err := NewMongoDatabase(app.Env, &DefaultMongoClientManager{})
+	mongo_client, err := NewMongoDatabase(app.Env, &DefaultMongoManager{})
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	app.Mongo = mongo_client
 	app.Env = env
-	
+
 	return *app
 }
 
 func (app *Application) CloseDBConnection() {
-	err := CloseMongoDBConnection(app.Mongo, &DefaultMongoClientManager{})
+	err := CloseMongoDBConnection(app.Mongo, &DefaultMongoManager{})
 	if err != nil {
 		log.Println("Error closing MongoDB connection:", err)
 	}

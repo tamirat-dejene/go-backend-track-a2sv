@@ -10,36 +10,36 @@ import (
 )
 
 // refactored the database connector to make it testable
-type MongoClientManager interface {
+type MongoManager interface {
 	Connect(ctx context.Context, uri string) (*mongo.Client, error)
 	Ping(ctx context.Context, client *mongo.Client) error
 	Disconnect(client *mongo.Client) error
 }
 
-type DefaultMongoClientManager struct{}
+type DefaultMongoManager struct{}
 
-func (d *DefaultMongoClientManager) Connect(ctx context.Context, uri string) (*mongo.Client, error) {
+func (d *DefaultMongoManager) Connect(ctx context.Context, uri string) (*mongo.Client, error) {
 	return mongo.Connect(ctx, options.Client().ApplyURI(uri))
 }
 
-func (d *DefaultMongoClientManager) Ping(ctx context.Context, client *mongo.Client) error {
+func (d *DefaultMongoManager) Ping(ctx context.Context, client *mongo.Client) error {
 	return client.Ping(ctx, nil)
 }
 
-func (d *DefaultMongoClientManager) Disconnect(client *mongo.Client) error {
+func (d *DefaultMongoManager) Disconnect(client *mongo.Client) error {
 	return client.Disconnect(context.TODO())
 }
 
-func NewMongoDatabase(env *Env, mcm MongoClientManager) (*mongo.Client, error) {
+func NewMongoDatabase(env *Env, mm MongoManager) (*mongo.Client, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
-	client, err := mcm.Connect(ctx, env.MongoUri)
+	client, err := mm.Connect(ctx, env.MongoUri)
 	if err != nil {
 		return nil, err
 	}
 
-	if err := mcm.Ping(ctx, client); err != nil {
+	if err := mm.Ping(ctx, client); err != nil {
 		return nil, err
 	}
 
@@ -47,12 +47,12 @@ func NewMongoDatabase(env *Env, mcm MongoClientManager) (*mongo.Client, error) {
 	return client, nil
 }
 
-func CloseMongoDBConnection(client *mongo.Client, mcm MongoClientManager) error {
+func CloseMongoDBConnection(client *mongo.Client, mm MongoManager) error {
 	if client == nil {
 		return nil
 	}
 
-	err := mcm.Disconnect(client)
+	err := mm.Disconnect(client)
 
 	if err != nil {
 		return  err
