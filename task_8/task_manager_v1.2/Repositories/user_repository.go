@@ -16,6 +16,7 @@ import (
 type userRepository struct {
 	database   mongo.Database
 	collection string
+	ps   *infrastructure.PasswordService
 }
 
 // Login implements domain.UserRepository.
@@ -26,7 +27,7 @@ func (u *userRepository) Login(ctx context.Context, user *domain.User) (*domain.
 	}
 
 	// check
-	err = infrastructure.ValidatePassword(storedUser.Password, user.Password)
+	err = u.ps.ValidatePassword(storedUser.Password, user.Password)
 	if err != nil {
 		return nil, fmt.Errorf("%s", constants.INVALID_CREDETNTIALS)
 	}
@@ -99,7 +100,7 @@ func (u *userRepository) Register(ctx context.Context, user *domain.User) (strin
 		return "", fmt.Errorf("%s", constants.DUPLICATE_USERNAME)
 	}
 
-	hashedPassword, err := infrastructure.GetHashedPassword(user.Password, bcrypt.DefaultCost)
+	hashedPassword, err := u.ps.GetHashedPassword(user.Password, bcrypt.DefaultCost)
 	if err != nil {
 		return "", err
 	}
@@ -109,9 +110,12 @@ func (u *userRepository) Register(ctx context.Context, user *domain.User) (strin
 	return user.UserName, err
 }
 
-func NewUserRepository(db mongo.Database, collection string) domain.UserRepository {
+
+
+func NewUserRepository(db mongo.Database, collection string, ps *infrastructure.PasswordService) domain.UserRepository {
 	return &userRepository{
 		database:   db,
 		collection: collection,
+		ps:         ps,
 	}
 }

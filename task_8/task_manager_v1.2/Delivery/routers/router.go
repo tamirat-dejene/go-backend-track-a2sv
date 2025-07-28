@@ -5,6 +5,7 @@ import (
 	"t8/taskmanager/Delivery/bootstrap"
 	"t8/taskmanager/Delivery/controllers"
 	domain "t8/taskmanager/Domain"
+	infrastructure "t8/taskmanager/Infrastructure"
 	"t8/taskmanager/Infrastructure/core/database/mongo"
 	"t8/taskmanager/Infrastructure/middlewares"
 	repositories "t8/taskmanager/Repositories"
@@ -26,7 +27,8 @@ func Setup(env *bootstrap.Env, timeout time.Duration, db mongo.Database, router 
 	// router.GET("/api")
 
 	var auth = router.Group("/auth")
-	ur := repositories.NewUserRepository(db, domain.UserCollection)
+
+	ur := repositories.NewUserRepository(db, domain.UserCollection, infrastructure.NewPasswordService())
 	uc := &controllers.UserController{
 		UserUsecase: usecases.NewUserUsecase(ur, timeout),
 		Env:         env,
