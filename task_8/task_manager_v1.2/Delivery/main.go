@@ -7,8 +7,8 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
-	"t7/taskmanager/Delivery/bootstrap"
-	"t7/taskmanager/Delivery/routers"
+	"t8/taskmanager/Delivery/bootstrap"
+	"t8/taskmanager/Delivery/routers"
 	"time"
 
 	"github.com/gin-gonic/gin"

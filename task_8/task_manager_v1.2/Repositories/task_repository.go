@@ -3,17 +3,17 @@ package repositories
 import (
 	"context"
 	"fmt"
-	domain "t7/taskmanager/Domain"
+	domain "t8/taskmanager/Domain"
+	"t8/taskmanager/Infrastructure/core/database/mongo"
 
 	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/mongo"
 )
 
+// wrapper
 type taskRepository struct {
-	database   *mongo.Database
+	database   mongo.Database
 	collection string
 }
-
 
 // Add implements domain.TaskRepository.
 func (tr *taskRepository) Add(ctx context.Context, task *domain.Task) error {
@@ -48,7 +48,7 @@ func (t *taskRepository) GetOne(ctx context.Context, id string) (domain.Task, er
 	var task domain.Task
 	err := collection.FindOne(ctx, bson.M{"_id": id}).Decode(&task)
 	if err != nil {
-		if err == mongo.ErrNoDocuments {
+		if err == mongo.ErrNoDocuments() {
 			return domain.Task{}, fmt.Errorf("task with ID %s not found", id)
 		}
 		return domain.Task{}, err
@@ -61,12 +61,12 @@ func (t *taskRepository) Remove(ctx context.Context, id string) error {
 	collection := t.database.Collection(t.collection)
 	filter := bson.M{"_id": id}
 
-	res, err := collection.DeleteOne(ctx, filter)
+	delete_count, err := collection.DeleteOne(ctx, filter)
 	if err != nil {
 		return fmt.Errorf("failed to delete task %w", err)
 	}
 
-	if res.DeletedCount == 0 {
+	if delete_count == 0 {
 		return fmt.Errorf("task with ID %s not found", id)
 	}
 	return nil
@@ -85,7 +85,7 @@ func (t *taskRepository) Update(ctx context.Context, id string, task *domain.Tas
 
 	result, err := collection.UpdateOne(ctx, filter, update)
 	if err != nil {
-		return domain.Task{}, nil
+		return domain.Task{}, err
 	}
 
 	if result.MatchedCount == 0 {
@@ -95,7 +95,7 @@ func (t *taskRepository) Update(ctx context.Context, id string, task *domain.Tas
 	return *task, nil
 }
 
-func NewTaskRepository(db *mongo.Database, collection string) domain.TaskRepository {
+func NewTaskRepository(db mongo.Database, collection string) domain.TaskRepository {
 	return &taskRepository{
 		database:   db,
 		collection: collection,

@@ -1,4 +1,4 @@
-module t7/taskmanager
+module t8/taskmanager
 
 go 1.24.5
 

@@ -1,14 +1,14 @@
 package bootstrap
 
 import (
+	"context"
 	"log"
-
-	"go.mongodb.org/mongo-driver/mongo"
+	"t8/taskmanager/Infrastructure/core/database/mongo"
 )
 
 type Application struct {
 	Env   *Env
-	Mongo *mongo.Client
+	Mongo mongo.Client
 }
 
 func App(envPath string) Application {
@@ -18,7 +18,7 @@ func App(envPath string) Application {
 		log.Fatal(err)
 	}
 
-	mongo_client, err := NewMongoDatabase(app.Env, &DefaultMongoManager{})
+	mongo_client, err := mongo.NewClient(env.MongoUri)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -30,8 +30,10 @@ func App(envPath string) Application {
 }
 
 func (app *Application) CloseDBConnection() {
-	err := CloseMongoDBConnection(app.Mongo, &DefaultMongoManager{})
-	if err != nil {
-		log.Println("Error closing MongoDB connection:", err)
+	if app.Mongo != nil {
+		err := app.Mongo.Disconnect(context.TODO())
+		if err != nil {
+			log.Printf("Error disconnecting from MongoDB: %v", err)
+		}
 	}
 }

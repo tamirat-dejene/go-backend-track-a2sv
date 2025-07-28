@@ -2,16 +2,16 @@ package routers
 
 import (
 	"net/http"
-	"t7/taskmanager/Delivery/bootstrap"
-	"t7/taskmanager/Delivery/controllers"
-	domain "t7/taskmanager/Domain"
-	"t7/taskmanager/Infrastructure/middlewares"
-	repositories "t7/taskmanager/Repositories"
-	usecases "t7/taskmanager/Usecases"
+	"t8/taskmanager/Delivery/bootstrap"
+	"t8/taskmanager/Delivery/controllers"
+	domain "t8/taskmanager/Domain"
+	"t8/taskmanager/Infrastructure/core/database/mongo"
+	"t8/taskmanager/Infrastructure/middlewares"
+	repositories "t8/taskmanager/Repositories"
+	usecases "t8/taskmanager/Usecases"
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"go.mongodb.org/mongo-driver/mongo"
 )
 
 /*
@@ -21,7 +21,7 @@ creating, updating, and deleting tasks using the Gin web framework.
 It also organizes authentication routes under "/api/auth" and task-related routes under "/api".
 */
 
-func Setup(env *bootstrap.Env, timeout time.Duration, db *mongo.Database, router *gin.Engine) {
+func Setup(env *bootstrap.Env, timeout time.Duration, db mongo.Database, router *gin.Engine) {
 	router.GET("/", func(ctx *gin.Context) { ctx.Redirect(http.StatusPermanentRedirect, "/api") })
 	// router.GET("/api")
 

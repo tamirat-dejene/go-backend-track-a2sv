@@ -3,17 +3,18 @@ package repositories
 import (
 	"context"
 	"fmt"
-	domain "t7/taskmanager/Domain"
-	infrastructure "t7/taskmanager/Infrastructure"
-	"t7/taskmanager/Infrastructure/constants"
+	domain "t8/taskmanager/Domain"
+	infrastructure "t8/taskmanager/Infrastructure"
+	"t8/taskmanager/Infrastructure/constants"
+	"t8/taskmanager/Infrastructure/core/database/mongo"
+
 
 	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/mongo"
 	"golang.org/x/crypto/bcrypt"
 )
 
 type userRepository struct {
-	database   *mongo.Database
+	database   mongo.Database
 	collection string
 }
 
@@ -39,11 +40,11 @@ func (u *userRepository) Delete(ctx context.Context, user_name string) error {
 	collection := u.database.Collection(u.collection)
 	filter := bson.M{"user_name": user_name}
 
-	res, err := collection.DeleteOne(ctx, filter)
+	del_cnt, err := collection.DeleteOne(ctx, filter)
 	if err != nil {
 		return err
 	}
-	if res.DeletedCount == 0 {
+	if del_cnt == 0 {
 		return fmt.Errorf("%s", constants.NOT_FOUND)
 	}
 	return nil
@@ -108,7 +109,7 @@ func (u *userRepository) Register(ctx context.Context, user *domain.User) (strin
 	return user.UserName, err
 }
 
-func NewUserRepository(db *mongo.Database, collection string) domain.UserRepository {
+func NewUserRepository(db mongo.Database, collection string) domain.UserRepository {
 	return &userRepository{
 		database:   db,
 		collection: collection,

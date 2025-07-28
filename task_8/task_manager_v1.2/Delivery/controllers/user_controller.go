@@ -2,10 +2,10 @@ package controllers
 
 import (
 	"net/http"
-	"t7/taskmanager/Delivery/bootstrap"
-	domain "t7/taskmanager/Domain"
-	infrastructure "t7/taskmanager/Infrastructure"
-	"t7/taskmanager/Infrastructure/constants"
+	"t8/taskmanager/Delivery/bootstrap"
+	domain "t8/taskmanager/Domain"
+	infrastructure "t8/taskmanager/Infrastructure"
+	"t8/taskmanager/Infrastructure/constants"
 
 	"github.com/gin-gonic/gin"
 )
@@ -19,7 +19,7 @@ func (uc *UserController) Delete(ctx *gin.Context) {
 	var id string
 
 	if err := ctx.ShouldBindUri(id); err != nil {
-		ctx.JSON(http.StatusBadRequest, domain.ErrorRespone{Message: "Invalid user ID", Error: err.Error()})
+		ctx.JSON(http.StatusBadRequest, domain.ErrorResponse{Message: "Invalid user ID", Error: err.Error()})
 		return
 	}
 
@@ -29,14 +29,14 @@ func (uc *UserController) Delete(ctx *gin.Context) {
 	if err != nil {
 		if err.Error() == constants.NOT_FOUND {
 			// user not found
-			ctx.JSON(http.StatusNotFound, domain.ErrorRespone{
+			ctx.JSON(http.StatusNotFound, domain.ErrorResponse{
 				Message: "User not found. Please verify the user ID and try again.",
 				Error:   err.Error(),
 			})
 			return
 		}
 
-		ctx.JSON(http.StatusInternalServerError, domain.ErrorRespone{Message: "Deletion failed", Error: err.Error()})
+		ctx.JSON(http.StatusInternalServerError, domain.ErrorResponse{Message: "Deletion failed", Error: err.Error()})
 		return
 	}
 
@@ -85,7 +85,7 @@ func (uc *UserController) Login(ctx *gin.Context) {
 	var user domain.User
 
 	if err := ctx.ShouldBind(&user); err != nil {
-		ctx.JSON(400, domain.ErrorRespone{Message: "Invalid request", Error: err.Error()})
+		ctx.JSON(400, domain.ErrorResponse{Message: "Invalid request", Error: err.Error()})
 		return
 	}
 

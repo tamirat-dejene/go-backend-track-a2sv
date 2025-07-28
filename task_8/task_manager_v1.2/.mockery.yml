@@ -1,0 +1,19 @@
+all: false
+dir: '{{.InterfaceDir}}' 
+force-file-write: true
+formatter: goimports
+include-auto-generated: false
+log-level: info
+structname: '{{.Mock}}{{.InterfaceName}}'
+pkgname: '{{.SrcPackageName}}'
+recursive: false
+require-template-schema-exists: true
+template: testify
+template-schema: '{{.Template}}.schema.json'
+packages:
+  "t8/taskmanager/Infrastructure/core/database/mongo":
+    config:
+      all: true
+      pkgname: mongo_mocks
+      dir: ./Infrastructure/core/database/mongo/mocks/
+      filename: "mongo_mocks.go"

@@ -2,8 +2,8 @@ package middlewares
 
 import (
 	"strings"
-	"t7/taskmanager/Delivery/bootstrap"
-	infrustructure "t7/taskmanager/Infrastructure"
+	"t8/taskmanager/Delivery/bootstrap"
+	infrustructure "t8/taskmanager/Infrastructure"
 
 	"github.com/gin-gonic/gin"
 )
